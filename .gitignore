@@ -1,0 +1,39 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore virtual environments
+venv/
+backend/venv/
+
+# Ignore environment variables
+.env
+*.env
+
+# Ignore build / distribution folders
+build/
+dist/
+*.egg-info/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore logs
+*.log
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore VS Code settings (optional, if you use it)
+.vscode/
+
+# Ignore PyCharm project settings (optional, if you use it)
+.idea/
+
+*.h5
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.avi
