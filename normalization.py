@@ -6,14 +6,21 @@ import math
 
 def normalize_face(cropped_face,landmarks):
     if cropped_face is not None and landmarks is not None:
-        left_eye=landmarks['left_eye']
-        right_eye=landmarks['right_eye']
+        left_eye = landmarks[0]   # SCRFD: first point is left eye
+        right_eye = landmarks[1]  # SCRFD: second point is right eye
         
         left_eye_x=left_eye[0]
         left_eye_y=left_eye[1]
         
         right_eye_x=right_eye[0]
         right_eye_y=right_eye[1]
+        
+        
+        
+        
+        
+        
+        
         
         dy=right_eye_y-left_eye_y
         dx=right_eye_x-left_eye_x
@@ -39,36 +46,34 @@ def normalize_face(cropped_face,landmarks):
     
 def normalize_entire_list(face_list,landmarks_list):
     
-    processed_face=[]
-    
-
-      
-    for face,landmarks in zip(face_list,landmarks_list):
-        
-          result=normalize_face(face,landmarks)
-          
-          processed_face.append(result)
-          
-          return processed_face
- 
+   
+    processed_face = []
+    for i, (face, landmarks) in enumerate(zip(face_list, landmarks_list)):
+        result = normalize_face(face, landmarks)
+        if result is not None:
+            processed_face.append(result)
+        else:
+            print(f"WARNING: Face {i+1} failed normalization")
+    return processed_face
  
  
  
  
 if __name__ == "__main__":
-    # Test the normalization
-    image_path = '/home/muthoni-gathiithi/Downloads/test image1.jpg'
+    from detection import multi_scale_detect  # Add this import
     
-    # Step 1: Load image
+    image_path = '/home/muthoni-gathiithi/Downloads/kuwait.jpeg'
     rgb_image = load_and_prepare_image(image_path)
     
-    # Step 2: Get faces and landmarks from detection
     if rgb_image is not None:
-        face_list, landmarks_list = crop_detected_faces(rgb_image)
-        
-        # Step 3: Normalize all faces
-        if face_list is not None:
-            normalized_faces = normalize_entire_list(face_list, landmarks_list)
-            print(f"Normalized {len(normalized_faces)} faces to 128x128!")
-        else:
-            print("No faces to normalize")     
+    # First detect faces
+     face_details = multi_scale_detect(rgb_image)
+     print(f"DEBUG: multi_scale_detect found {len(face_details)} faces")
+    
+    # Then crop them
+    face_list, landmarks_list = crop_detected_faces(face_details, rgb_image)
+    print(f"DEBUG: crop_detected_faces returned {len(face_list)} faces")
+    
+    if face_list is not None:
+        normalized_faces = normalize_entire_list(face_list, landmarks_list)
+        print(f"Normalized {len(normalized_faces)} faces to 128x128!")

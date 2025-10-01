@@ -80,7 +80,7 @@ def crop_detected_faces(face_details, Image_RGB, det_thresh=0.3):
 
 
 if __name__ == "__main__":
-    image_path = '/home/muthoni-gathiithi/Downloads/grad.jpg'
+    image_path = '/home/muthoni-gathiithi/Downloads/many.png'
     rgb_image = load_and_prepare_image(image_path)
     if rgb_image is not None:
         print(f"Image loaded successfully! Size: {rgb_image.shape}")
