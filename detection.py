@@ -6,12 +6,39 @@ import os
 # Initialize SCRFD detector
 app = FaceAnalysis(providers=['CPUExecutionProvider'])
 
+# -------------------- PREPROCESSING -------------------- #
+def preprocess_image(image_bgr):
+    """Apply preprocessing: CLAHE for lighting + sharpening for blur"""
+    # Convert to LAB color space (better for CLAHE on brightness channel)
+    lab = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+
+    # CLAHE on L-channel (brightness)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    l_eq = clahe.apply(l)
+
+    # Merge channels back
+    lab_eq = cv2.merge((l_eq, a, b))
+    image_eq = cv2.cvtColor(lab_eq, cv2.COLOR_LAB2BGR)
+
+    # Sharpening filter (helps with blur)
+    kernel = np.array([[0, -1, 0],
+                       [-1, 5, -1],
+                       [0, -1, 0]])
+    sharpened = cv2.filter2D(image_eq, -1, kernel)
+
+    return sharpened
+
 def load_and_prepare_image(image_path):
-    """Load image and convert to RGB"""
+    """Load image, preprocess, convert to RGB"""
     if os.path.isfile(image_path):
         image = cv2.imread(image_path)
         if image is not None:
-            image_RGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # Step 1: Preprocess for lighting + blur
+            processed = preprocess_image(image)
+
+            # Step 2: Convert to RGB (ArcFace expects RGB later)
+            image_RGB = cv2.cvtColor(processed, cv2.COLOR_BGR2RGB)
             return image_RGB
         else:
             print("Error loading image")
@@ -20,6 +47,7 @@ def load_and_prepare_image(image_path):
         print("Invalid image path")
         return None
 
+# -------------------- DETECTION UTILS -------------------- #
 def iou(boxA, boxB):
     """Compute Intersection over Union (IoU) between two bounding boxes"""
     xA = max(boxA[0], boxB[0])
@@ -78,9 +106,9 @@ def crop_detected_faces(face_details, Image_RGB, det_thresh=0.3):
         landmarks_list.append(face.kps.tolist())
     return face_list, landmarks_list
 
-
+# -------------------- MAIN -------------------- #
 if __name__ == "__main__":
-    image_path = '/home/muthoni-gathiithi/Downloads/many.png'
+    image_path = '/home/muthoni-gathiithi/Downloads/kuwait.jpeg'
     rgb_image = load_and_prepare_image(image_path)
     if rgb_image is not None:
         print(f"Image loaded successfully! Size: {rgb_image.shape}")
