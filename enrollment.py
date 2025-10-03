@@ -79,4 +79,4 @@ if __name__ == "__main__":
         "/home/muthoni-gathiithi/Pictures/Screenshots/Screenshot from 2025-10-02 22-47-35.png"
     ]
     
-    enroll_student("STU001", "Joyce Mwangi", student_photos)
+    enroll_student("STU001", "Joyce Muthoni", student_photos)
